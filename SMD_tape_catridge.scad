@@ -15,7 +15,17 @@ tt=1.5;
 
 tw = 9;  // tape width.
 
-h = bt + tw + bt; // Use bt also as top thickness. 
+slip_space = 0.2;
+
+magnet_h = 0.5;
+magnet_d = 4;
+
+bolt_h = 3;
+bolt_d = 4;
+
+cover_wt = 0.8;
+
+h = bt + tw ;// + bt; // Use bt also as top thickness. 
 
 
 module rc (x,y,z,rr)
@@ -57,40 +67,73 @@ module rt2 (x1, x2, y, z, rr)
   }
 }
 
+module main_body(h) {
+    
+    difference() {
+    union() {
+        // main body.
+        translate ([0,0,-bt]) rc (size, size, h, 5);
+        // cover-output
+        translate ([size/2-3-1,size/2-4+1,-bt]) rotate (-24) translate ([-8+2,0,0])  rc (16, 6,h, 3);
+    }
+    
+     // space for the rails to be in. 
+    translate ([size/2-1,-size/2+7.5,-bt-.1]) rotate (90) rt (8,5.5,8,h+2,.2);
+    translate ([-size/2,-size/2,h/2-.6]) cube ([14,22, h+1],center=true);
 
+    // chamfer to ease putting in rails. 
+    translate ([-size/2,-size/2,h/2-.7]) rotate (30) cube ([19,14, h+1],center=true);
+    
+    // space for the clip to move when activated. 
+    translate ([-size/2-2,0,h/2-bt+.1]) rotate (4.5) cube ([8,size,h+2],center=true);
+    translate ([-size/2-2,0,h/2-bt+.1]) rotate (-4.5) cube ([3,size+4,h+2],center=true);
+    translate ([-size/2-10+4,17.5,-bt-.1]) cylinder (r=12,h=h+2);
+    
+    }
+}
+
+module cover() 
+{
+    difference() {
+        union() {
+            main_body(cover_wt);
+            translate ([1,0,-1-cover_wt])cylinder (d=size-2*wt-1-slip_space, h=1);
+        
+            // bolt 1 & 2
+            translate([-20,-27,-0.3-cover_wt-bolt_h]) cylinder(d=bolt_d, h=bolt_h);
+            translate([26,24,-0.3-cover_wt-bolt_h]) cylinder(d=bolt_d, h=bolt_h);
+        }
+        
+        // magnet 1 & 2
+        translate([23,-27,-0.3-cover_wt]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
+        translate([-23,27,-0.3-cover_wt]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
+    }
+}
 
 module magazine (h)
 {
   // rr=5;
 
   difference () {
-    union () {
-      // main body.
-      translate ([0,0,-bt]) rc (size, size, h, 5);
-      // cover-output
-      translate ([size/2-3-1,size/2-4+1,-bt]) rotate (-24) translate ([-8+2,0,0])  rc (16, 6,h, 3);
-    }
+      
+    main_body(h);
     // main space for the parts. 
     translate ([1,0,0])cylinder (d=size-2*wt-1, h=h);
 
     //cover exit path.
     translate ([size/2-15,size/2+3/2,-bt-.1])  translate ([-10+2,0,0])  rc (20, 3,h+1, 1.5);
-    translate ([size/2-13.5,size/2+1.5,-bt-.1 ]) rotate (40) translate ([-3.5,0,0])  rc (7, 2,h+1, 1);
+    translate ([size/2-13.5,size/2+1.5,.1 ]) rotate (40) translate ([-3.5,0,0])  rc (7, 2,h+1, 1);
 
     // the "exit tube"
-    translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw]);
+    translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw+0.1]);
     
-    // space for the rails to be in. 
-    translate ([size/2-1,-size/2+7.5,-bt-.1]) rotate (90) rt (8,5.5,8,h+2,.2);
-    translate ([-size/2,-size/2,h/2-.6]) cube ([14,22, h+1],center=true);
-
-    // chamfer to ease putting in rails. 
-    translate ([-size/2,-size/2,h/2-.7]) rotate (30) cube ([19,14, h+1],center=true);
-
-    // space for the clip to move when activated. 
-    translate ([-size/2-2,0,h/2-bt+.1]) rotate (4.5) cube ([8,size,h+2],center=true);
-    translate ([-size/2-2,0,h/2-bt+.1]) rotate (-4.5) cube ([3,size+4,h+2],center=true);
-    translate ([-size/2-10+4,17.5,-bt-.1]) cylinder (r=12,h=h+2);
+    
+      // hole for bolt 1 & 2
+    translate([-20,-27,h-bt-bolt_h-slip_space]) cylinder(d=bolt_d+slip_space, h=bolt_h+0.1+slip_space);
+    translate([26,24,h-bt-bolt_h-slip_space]) cylinder(d=bolt_d+slip_space, h=bolt_h+0.1+slip_space);
+    // hole for magnet 1 & 2
+    translate([23,-27,h-bt-magnet_h-0.1]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
+    translate([-23,27,h-bt-magnet_h-0.1]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
 
   }
 
@@ -141,11 +184,14 @@ module magazine (h)
 
 function bit_set(b, n) = floor(n / pow(2, b)) % 2;
 
-view=4;
+//view=4;
+translate([0,0,bt]) magazine (h);
+//main_body(h);
 
+translate([70,0,0]) rotate([0,180,0]) cover();
 
-if (bit_set(0, view)) translate ([70,0,0]) oldstl ();
-if (bit_set(1, view)) color ("blue") translate ([0,0, 0.1]) oldstl ();
-if (bit_set(1, view)) magazine (h);
-if (bit_set(2, view)) translate ([-70,0,0]) magazine (h);
+//if (bit_set(0, view)) translate ([70,0,0]) oldstl ();
+//if (bit_set(1, view)) color ("blue") translate ([0,0, 0.1]) oldstl ();
+//if (bit_set(1, view)) magazine (h);
+//if (bit_set(2, view)) translate ([-70,0,0]) magazine (h);
 
