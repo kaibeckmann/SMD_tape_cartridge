@@ -15,7 +15,7 @@ tt=1.5;
 
 tw = 9;  // tape width.
 
-slip_space = 0.2;
+slip_space = 0.5;
 
 magnet_h = 0.5;
 magnet_d = 4;
@@ -23,9 +23,9 @@ magnet_d = 4;
 bolt_h = 3;
 bolt_d = 4;
 
-cover_wt = 0.8;
+cover_wt = 1.1;
 
-h = bt + tw ;// + bt; // Use bt also as top thickness. 
+h = bt + tw + bt; // Use bt also as top thickness. 
 
 
 module rc (x,y,z,rr)
@@ -96,17 +96,17 @@ module cover()
 {
     difference() {
         union() {
-            main_body(cover_wt);
+            translate ([0,0,-0.1])main_body(cover_wt);
             translate ([1,0,-1-cover_wt])cylinder (d=size-2*wt-1-slip_space, h=1);
         
             // bolt 1 & 2
-            translate([-20,-27,-0.3-cover_wt-bolt_h]) cylinder(d=bolt_d, h=bolt_h);
-            translate([26,24,-0.3-cover_wt-bolt_h]) cylinder(d=bolt_d, h=bolt_h);
+            translate([-20,-27,-cover_wt-bolt_h]) cylinder(d=bolt_d-slip_space, h=bolt_h);
+            translate([26,24,-cover_wt-bolt_h]) cylinder(d=bolt_d-slip_space, h=bolt_h);
         }
         
         // magnet 1 & 2
-        translate([23,-27,-0.3-cover_wt]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
-        translate([-23,27,-0.3-cover_wt]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
+        translate([23,-27,-cover_wt-0.1]) cylinder(d=magnet_d+slip_space, h=magnet_h+0.1+0.2);
+        translate([-23,27,-cover_wt-0.1]) cylinder(d=magnet_d+slip_space, h=magnet_h+0.1+0.2);
     }
 }
 
@@ -125,15 +125,15 @@ module magazine (h)
     translate ([size/2-13.5,size/2+1.5,.1 ]) rotate (40) translate ([-3.5,0,0])  rc (7, 2,h+1, 1);
 
     // the "exit tube"
-    translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw+0.1]);
+    translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw+0.1+ bt]);
     
     
       // hole for bolt 1 & 2
     translate([-20,-27,h-bt-bolt_h-slip_space]) cylinder(d=bolt_d+slip_space, h=bolt_h+0.1+slip_space);
     translate([26,24,h-bt-bolt_h-slip_space]) cylinder(d=bolt_d+slip_space, h=bolt_h+0.1+slip_space);
     // hole for magnet 1 & 2
-    translate([23,-27,h-bt-magnet_h-0.1]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
-    translate([-23,27,h-bt-magnet_h-0.1]) cylinder(d=magnet_d+0.1, h=magnet_h+0.1+0.1);
+    translate([23,-27,h-bt-magnet_h-0.2]) cylinder(d=magnet_d+slip_space, h=magnet_h+0.1+0.2);
+    translate([-23,27,h-bt-magnet_h-0.2]) cylinder(d=magnet_d+slip_space, h=magnet_h+0.1+0.2);
 
   }
 
@@ -185,10 +185,10 @@ module magazine (h)
 function bit_set(b, n) = floor(n / pow(2, b)) % 2;
 
 //view=4;
-translate([0,0,bt]) magazine (h);
+//translate([0,0,bt]) magazine (h);
 //main_body(h);
-
-translate([70,0,0]) rotate([0,180,0]) cover();
+cover();
+//translate([70,0,0]) rotate([0,180,0]) cover();
 
 //if (bit_set(0, view)) translate ([70,0,0]) oldstl ();
 //if (bit_set(1, view)) color ("blue") translate ([0,0, 0.1]) oldstl ();
