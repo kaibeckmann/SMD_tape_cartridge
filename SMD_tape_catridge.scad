@@ -11,7 +11,7 @@ $fn = 100;
 bt = 1;
 size = 65;
 wt=2;
-tt=1.5;
+tt=1.8;
 
 tw = 9;  // tape width.
 
@@ -90,6 +90,8 @@ module main_body(h) {
     translate ([-size/2-10+4,17.5,-bt-.1]) cylinder (r=12,h=h+2);
     
     }
+    
+    
 }
 
 module cover() 
@@ -125,7 +127,7 @@ module magazine (h)
     translate ([size/2-13.5,size/2+1.5,.1 ]) rotate (40) translate ([-3.5,0,0])  rc (7, 2,h+1, 1);
 
     // the "exit tube"
-    translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw+0.1+ bt]);
+   # translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw+0.1+ bt]);
     
     
       // hole for bolt 1 & 2
@@ -135,7 +137,15 @@ module magazine (h)
     translate([23,-27,h-bt-magnet_h-0.2]) cylinder(d=magnet_d+slip_space, h=magnet_h+0.1+0.2);
     translate([-23,27,h-bt-magnet_h-0.2]) cylinder(d=magnet_d+slip_space, h=magnet_h+0.1+0.2);
 
+    txt_d = str("tt: ",tt);
+    txt_w = str("tw: ", tw);
+    translate([-20,0,bt-1.2]) linear_extrude(height = 0.5) 
+       text(txt_d );
+       translate([-20,-12,bt-1.2]) linear_extrude(height = 0.5) 
+       text(txt_w );
   }
+  
+  
 
   // The clip. We print it in the "closed" position, rotated 4 degrees. 
   translate ([-size/2-.5,1.3,h/2-bt]) rotate (4.) 
@@ -185,9 +195,9 @@ module magazine (h)
 function bit_set(b, n) = floor(n / pow(2, b)) % 2;
 
 //view=4;
-//translate([0,0,bt]) magazine (h);
+translate([0,0,bt]) magazine (h);
 //main_body(h);
-cover();
+//cover();
 //translate([70,0,0]) rotate([0,180,0]) cover();
 
 //if (bit_set(0, view)) translate ([70,0,0]) oldstl ();
