@@ -8,10 +8,12 @@ module oldstl ()
 
 $fn = 100;
 
+version = 1.1;
+
 bt = 1;
 size = 65;
 wt=2;
-tt=1.8;
+tt=1.5;       // tape thickness
 
 tw = 9;  // tape width.
 
@@ -74,7 +76,7 @@ module main_body(h) {
         // main body.
         translate ([0,0,-bt]) rc (size, size, h, 5);
         // cover-output
-        translate ([size/2-3-1,size/2-4+1,-bt]) rotate (-24) translate ([-8+2,0,0])  rc (16, 6,h, 3);
+        translate ([size/2-3-1,size/2-4+1,-bt]) rotate (-24) translate ([-10+3,0,0])  rc (22, 6,h, 3);
     }
     
      // space for the rails to be in. 
@@ -86,7 +88,7 @@ module main_body(h) {
     
     // space for the clip to move when activated. 
     translate ([-size/2-2,0,h/2-bt+.1]) rotate (4.5) cube ([8,size,h+2],center=true);
-    translate ([-size/2-2,0,h/2-bt+.1]) rotate (-4.5) cube ([3,size+4,h+2],center=true);
+    translate ([-size/2-2,0,h/2-bt+.1]) rotate (-4.5) cube ([4.5,size+4,h+2],center=true);
     translate ([-size/2-10+4,17.5,-bt-.1]) cylinder (r=12,h=h+2);
     
     }
@@ -127,7 +129,7 @@ module magazine (h)
     translate ([size/2-13.5,size/2+1.5,.1 ]) rotate (40) translate ([-3.5,0,0])  rc (7, 2,h+1, 1);
 
     // the "exit tube"
-   # translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw+0.1+ bt]);
+    translate ([.1,size/2-wt-tt-.5,0])  cube ([size/2,tt,tw+0.1+ bt]);
     
     
       // hole for bolt 1 & 2
@@ -139,10 +141,13 @@ module magazine (h)
 
     txt_d = str("tt: ",tt);
     txt_w = str("tw: ", tw);
+    txt_v = str("V", version);
     translate([-20,0,bt-1.2]) linear_extrude(height = 0.5) 
        text(txt_d );
-       translate([-20,-12,bt-1.2]) linear_extrude(height = 0.5) 
+    translate([-20,-12,bt-1.2]) linear_extrude(height = 0.5) 
        text(txt_w );
+    translate([-14,14,bt-1.2]) linear_extrude(height = 0.5) 
+       text(txt_v );
   }
   
   
@@ -199,6 +204,7 @@ translate([0,0,bt]) magazine (h);
 //main_body(h);
 //cover();
 //translate([70,0,0]) rotate([0,180,0]) cover();
+//translate([0,0,20]) cover();
 
 //if (bit_set(0, view)) translate ([70,0,0]) oldstl ();
 //if (bit_set(1, view)) color ("blue") translate ([0,0, 0.1]) oldstl ();
